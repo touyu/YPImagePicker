@@ -46,19 +46,19 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDele
         settings.isHighResolutionPhotoEnabled = true
         
         // Set flash mode.
-        if let deviceInput = deviceInput {
+        if let deviceInput = deviceInput, let supportedFlashModes = photoOutput.value(forKey: "supportedFlashModes") as? [AVCaptureDevice.FlashMode] {
             if deviceInput.device.isFlashAvailable {
                 switch currentFlashMode {
                 case .auto:
-                    if photoOutput.supportedFlashModes.contains(.auto) {
+                    if supportedFlashModes.contains(.auto) {
                         settings.flashMode = .auto
                     }
                 case .off:
-                    if photoOutput.supportedFlashModes.contains(.off) {
+                    if supportedFlashModes.contains(.off) {
                         settings.flashMode = .off
                     }
                 case .on:
-                    if photoOutput.supportedFlashModes.contains(.on) {
+                    if supportedFlashModes.contains(.on) {
                         settings.flashMode = .on
                     }
                 }
@@ -92,7 +92,7 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDele
 
     func shoot(completion: @escaping (Data) -> Void) {
         block = completion
-    
+
         // Set current device orientation
         setCurrentOrienation()
         
@@ -105,7 +105,7 @@ class PostiOS10PhotoCapture: NSObject, YPPhotoCapture, AVCapturePhotoCaptureDele
         guard let data = photo.fileDataRepresentation() else { return }
         block?(data)
     }
-        
+
     func photoOutput(_ output: AVCapturePhotoOutput,
                      didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
                      previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
